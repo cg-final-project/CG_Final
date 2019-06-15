@@ -1,1 +1,4 @@
-# CG_Final
+# README
+
+Computer Graphics Final Project
+
