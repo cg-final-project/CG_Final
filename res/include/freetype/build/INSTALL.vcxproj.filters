@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="E:\OpenGL\Libraries\include\ft2100\freetype-2.10.0\build\CMakeFiles\edd213908e485de0e73027eecc4ee61e\INSTALL_force.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{59C61FF0-9386-3019-A2E3-85CEF2E02DE3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

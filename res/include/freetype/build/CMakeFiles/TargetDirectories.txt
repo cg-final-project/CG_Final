@@ -1,0 +1,5 @@
+E:/OpenGL/Libraries/include/ft2100/freetype-2.10.0/build/CMakeFiles/PACKAGE.dir
+E:/OpenGL/Libraries/include/ft2100/freetype-2.10.0/build/CMakeFiles/freetype.dir
+E:/OpenGL/Libraries/include/ft2100/freetype-2.10.0/build/CMakeFiles/INSTALL.dir
+E:/OpenGL/Libraries/include/ft2100/freetype-2.10.0/build/CMakeFiles/ALL_BUILD.dir
+E:/OpenGL/Libraries/include/ft2100/freetype-2.10.0/build/CMakeFiles/ZERO_CHECK.dir
