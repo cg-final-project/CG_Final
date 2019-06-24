@@ -28,6 +28,15 @@ struct Vertex {
 	glm::vec3 Bitangent;
 };
 
+struct Material {
+	//材质颜色光照
+	glm::vec4 Ka;
+	//漫反射
+	glm::vec4 Kd;
+	//镜反射
+	glm::vec4 Ks;
+};
+
 struct Texture {
 	unsigned int id;
 	string type;
@@ -40,11 +49,13 @@ public:
 	vector<Vertex> vertices;
 	vector<unsigned int> indices;
 	vector<Texture> textures;
+	Material mats;
 	unsigned int VAO;
+	unsigned int uniformBlockIndex;
 
 	/*  Functions  */
 	// constructor
-	Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures);
+	Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures, Material mat);
 
 	// render the mesh
 	void Draw(Shader shader);

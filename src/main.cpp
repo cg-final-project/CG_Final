@@ -30,6 +30,9 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+// lighting
+glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+
 int main()
 {
 	// glfw: initialize and configure
@@ -78,8 +81,9 @@ int main()
 
 	// load models
 	// -----------
-	Model playerModel("C:/Users/cheny/Desktop/t-pose-obj/t-pose.obj");
-	Model courtModel("C:/Users/cheny/Desktop/court-obj/court.obj");
+	Model courtModel("../../resource/model/court-obj/court.obj");
+	Model playerModel("../../resource/model/t-pose-obj/t-pose.obj");
+	
 
 	// draw in wireframe
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -106,6 +110,21 @@ int main()
 		// don't forget to enable shader before setting uniforms
 		ourShader.use();
 
+		ourShader.setVec3("light.position", lightPos);
+		ourShader.setVec3("viewPos", camera.Position);
+
+		// light properties
+		ourShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+		ourShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+		ourShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+		ourShader.setFloat("light.constant", 1.0f);
+		ourShader.setFloat("light.linear", 0.09f);
+		ourShader.setFloat("light.quadratic", 0.032f);
+
+		// material properties
+		ourShader.setFloat("shininess", 32.0f);
+
+
 		// view/projection transformations
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 		glm::mat4 view = camera.GetViewMatrix();
@@ -121,7 +140,7 @@ int main()
 
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0, 1.0, 0.0));
 		ourShader.setMat4("model", model);
-		playerModel.Draw(ourShader);
+		//playerModel.Draw(ourShader);
 
 		
 
