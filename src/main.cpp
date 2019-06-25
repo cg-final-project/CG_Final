@@ -25,6 +25,18 @@ void RenderText(std::string text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3
 void SkyBox();
 unsigned int loadCubemap(vector<string> faces);
 
+/// Holds all state information relevant to a character as loaded using FreeType
+struct Character {
+	GLuint TextureID;   // ID handle of the glyph texture
+	glm::ivec2 Size;    // Size of glyph
+	glm::ivec2 Bearing;  // Offset from baseline to left/top of glyph
+	GLuint Advance;    // Horizontal offset to advance to next glyph
+};
+
+std::map<GLchar, Character> Characters;
+
+GLuint VAO, VBO;
+
 // settings
 const unsigned int SCR_WIDTH = 1280;
 const unsigned int SCR_HEIGHT = 700;
@@ -98,6 +110,81 @@ int main()
 	Model playerModel("C:/Users/cheny/Desktop/CG_Final/res/model/player/pose.obj");
 	Model ballModel("C:/Users/cheny/Desktop/CG_Final/res/model/ball/ball.obj");
 
+	Shader shader("skybox.vs", "skybox.fs");
+
+	float skyboxVertices[] = {
+		// positions          
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		-1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f
+	};
+	//skybox VAO
+	unsigned int skyboxVAO, skyboxVBO;
+	glGenVertexArrays(1, &skyboxVAO);
+	glGenBuffers(1, &skyboxVBO);
+	glBindVertexArray(skyboxVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+
+	vector<std::string> faces
+	{
+		"C:/Users/cheny/Desktop/CG_Final/res/textures/skybox3/right.jpg",
+		"C:/Users/cheny/Desktop/CG_Final/res/textures/skybox3/left.jpg",
+		"C:/Users/cheny/Desktop/CG_Final/res/textures/skybox3/top.jpg",
+		"C:/Users/cheny/Desktop/CG_Final/res/textures/skybox3/bottom.jpg",
+		"C:/Users/cheny/Desktop/CG_Final/res/textures/skybox3/front.jpg",
+		"C:/Users/cheny/Desktop/CG_Final/res/textures/skybox3/back.jpg"
+	};
+	unsigned int cubemapTexture = loadCubemap(faces);
+
+	// shader configuration
+	// --------------------
+
+	shader.use();
+	shader.setInt("skybox", 0);
+
+
 	// draw in wireframe
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -164,7 +251,21 @@ int main()
 		ourShader.setMat4("model", model);
 		playerModel.Draw(ourShader);
 
-		SkyBox();
+		// draw skybox as last
+		glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+		shader.use();
+		view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
+		projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		shader.setMat4("view", view);
+		shader.setMat4("projection", projection);
+		// skybox cube
+		glBindVertexArray(skyboxVAO);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glBindVertexArray(0);
+		glDepthFunc(GL_LESS); // set depth function back to default
+
 		RenderText("Basketball", 400.0f, 570.0f, 1.0f, glm::vec3(0.0f, 0.0, 0.0f));
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -173,7 +274,8 @@ int main()
 		glfwPollEvents();
 	}
 
-	courtModel.clear();
+	glDeleteVertexArrays(1, &skyboxVAO);
+	glDeleteBuffers(1, &skyboxVBO);
 
 	// glfw: terminate, clearing all previously allocated GLFW resources.
 	// ------------------------------------------------------------------
@@ -237,17 +339,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 //
 void RenderText(std::string text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3 color)
 {
-	/// Holds all state information relevant to a character as loaded using FreeType
-	struct Character {
-		GLuint TextureID;   // ID handle of the glyph texture
-		glm::ivec2 Size;    // Size of glyph
-		glm::ivec2 Bearing;  // Offset from baseline to left/top of glyph
-		GLuint Advance;    // Horizontal offset to advance to next glyph
-	};
 
-	std::map<GLchar, Character> Characters;
-
-	GLuint VAO, VBO;
 
 	// Configure VAO/VBO for texture quads
 	glGenVertexArrays(1, &VAO);
@@ -268,7 +360,7 @@ void RenderText(std::string text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3
 	shader.setMat4("projection", projection);
 
 	// FreeType
-	FT_Library ft;
+	FT_Library ft = NULL;
 	// All functions return a value different than 0 whenever an error occurred
 	if (FT_Init_FreeType(&ft))
 		std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
@@ -407,99 +499,4 @@ unsigned int loadCubemap(vector<std::string> faces)
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
 	return textureID;
-}
-
-void SkyBox() {
-
-	Shader shader("skybox.vs", "skybox.fs");
-
-	float skyboxVertices[] = {
-		// positions          
-		-1.0f,  1.0f, -1.0f,
-		-1.0f, -1.0f, -1.0f,
-		 1.0f, -1.0f, -1.0f,
-		 1.0f, -1.0f, -1.0f,
-		 1.0f,  1.0f, -1.0f,
-		-1.0f,  1.0f, -1.0f,
-
-		-1.0f, -1.0f,  1.0f,
-		-1.0f, -1.0f, -1.0f,
-		-1.0f,  1.0f, -1.0f,
-		-1.0f,  1.0f, -1.0f,
-		-1.0f,  1.0f,  1.0f,
-		-1.0f, -1.0f,  1.0f,
-
-		 1.0f, -1.0f, -1.0f,
-		 1.0f, -1.0f,  1.0f,
-		 1.0f,  1.0f,  1.0f,
-		 1.0f,  1.0f,  1.0f,
-		 1.0f,  1.0f, -1.0f,
-		 1.0f, -1.0f, -1.0f,
-
-		-1.0f, -1.0f,  1.0f,
-		-1.0f,  1.0f,  1.0f,
-		 1.0f,  1.0f,  1.0f,
-		 1.0f,  1.0f,  1.0f,
-		 1.0f, -1.0f,  1.0f,
-		-1.0f, -1.0f,  1.0f,
-
-		-1.0f,  1.0f, -1.0f,
-		 1.0f,  1.0f, -1.0f,
-		 1.0f,  1.0f,  1.0f,
-		 1.0f,  1.0f,  1.0f,
-		-1.0f,  1.0f,  1.0f,
-		-1.0f,  1.0f, -1.0f,
-
-		-1.0f, -1.0f, -1.0f,
-		-1.0f, -1.0f,  1.0f,
-		 1.0f, -1.0f, -1.0f,
-		 1.0f, -1.0f, -1.0f,
-		-1.0f, -1.0f,  1.0f,
-		 1.0f, -1.0f,  1.0f
-	};
-	//skybox VAO
-	unsigned int skyboxVAO, skyboxVBO;
-	glGenVertexArrays(1, &skyboxVAO);
-	glGenBuffers(1, &skyboxVBO);
-	glBindVertexArray(skyboxVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-
-
-	vector<std::string> faces
-	{
-		"C:/Users/cheny/Desktop/CG_Final/res/textures/skybox3/right.jpg",
-		"C:/Users/cheny/Desktop/CG_Final/res/textures/skybox3/left.jpg",
-		"C:/Users/cheny/Desktop/CG_Final/res/textures/skybox3/top.jpg",
-		"C:/Users/cheny/Desktop/CG_Final/res/textures/skybox3/bottom.jpg",
-		"C:/Users/cheny/Desktop/CG_Final/res/textures/skybox3/front.jpg",
-		"C:/Users/cheny/Desktop/CG_Final/res/textures/skybox3/back.jpg"
-	};
-	unsigned int cubemapTexture = loadCubemap(faces);
-
-	// shader configuration
-	// --------------------
-
-	shader.use();
-	shader.setInt("skybox", 0);
-
-	// draw skybox as last
-	glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
-	shader.use();
-	glm::mat4 view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // remove translation from the view matrix
-	glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-	shader.setMat4("view", view);
-	shader.setMat4("projection", projection);
-	// skybox cube
-	glBindVertexArray(skyboxVAO);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-	glBindVertexArray(0);
-	glDepthFunc(GL_LESS); // set depth function back to default
-
-	glDeleteVertexArrays(1, &skyboxVAO);
-	glDeleteBuffers(1, &skyboxVBO);
 }
