@@ -94,9 +94,9 @@ int main()
 
 	// load models
 	// -----------
-	Model courtModel("../../resource/model/court-obj/court.obj");
-	Model playerModel("../../resource/model/t-pose-obj/t-pose.obj");
-	
+	Model courtModel("C:/Users/cheny/Desktop/CG_Final/res/model/court/court.obj");
+	Model playerModel("C:/Users/cheny/Desktop/CG_Final/res/model/player/pose.obj");
+	Model ballModel("C:/Users/cheny/Desktop/CG_Final/res/model/ball/ball.obj");
 
 	// draw in wireframe
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -151,20 +151,29 @@ int main()
 		ourShader.setMat4("model", model);
 		courtModel.Draw(ourShader);
 
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, -1.7f, 0.5f)); // translate it down so it's at the center of the scene
+		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
+		ourShader.setMat4("model", model);
+		ballModel.Draw(ourShader);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f)); // translate it down so it's at the center of the scene
+		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
 		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0, 1.0, 0.0));
 		ourShader.setMat4("model", model);
-		//playerModel.Draw(ourShader);
+		playerModel.Draw(ourShader);
 
 		SkyBox();
 		RenderText("Basketball", 400.0f, 570.0f, 1.0f, glm::vec3(0.0f, 0.0, 0.0f));
-
-
 
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
+
+	courtModel.clear();
 
 	// glfw: terminate, clearing all previously allocated GLFW resources.
 	// ------------------------------------------------------------------
@@ -266,7 +275,7 @@ void RenderText(std::string text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3
 
 	// Load font as face
 	FT_Face face = NULL;
-	if (FT_New_Face(ft, "../../resource/Fonts/Inkfree.ttf", 0, &face))
+	if (FT_New_Face(ft, "C:/Users/cheny/Desktop/CG_Final/res/fonts/Inkfree.ttf", 0, &face))
 		std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
 
 	// Set size to load glyphs as
@@ -461,12 +470,12 @@ void SkyBox() {
 
 	vector<std::string> faces
 	{
-		"../../resource/textures/skybox3/right.jpg",
-		"../../resource/textures/skybox3/left.jpg",
-		"../../resource/textures/skybox3/top.jpg",
-		"../../resource/textures/skybox3/bottom.jpg",
-		"../../resource/textures/skybox3/front.jpg",
-		"../../resource/textures/skybox3/back.jpg"
+		"C:/Users/cheny/Desktop/CG_Final/res/textures/skybox3/right.jpg",
+		"C:/Users/cheny/Desktop/CG_Final/res/textures/skybox3/left.jpg",
+		"C:/Users/cheny/Desktop/CG_Final/res/textures/skybox3/top.jpg",
+		"C:/Users/cheny/Desktop/CG_Final/res/textures/skybox3/bottom.jpg",
+		"C:/Users/cheny/Desktop/CG_Final/res/textures/skybox3/front.jpg",
+		"C:/Users/cheny/Desktop/CG_Final/res/textures/skybox3/back.jpg"
 	};
 	unsigned int cubemapTexture = loadCubemap(faces);
 
@@ -491,4 +500,6 @@ void SkyBox() {
 	glBindVertexArray(0);
 	glDepthFunc(GL_LESS); // set depth function back to default
 
+	glDeleteVertexArrays(1, &skyboxVAO);
+	glDeleteBuffers(1, &skyboxVBO);
 }

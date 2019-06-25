@@ -18,7 +18,7 @@ Ks 0.010000 0.010000 0.010000
 Ni 1.000000
 d 1.000000
 illum 2
-map_Kd img-0.jpeg
+map_Kd img-1.jpeg
 
 newmtl mtl_10
 Ns 96.078431
