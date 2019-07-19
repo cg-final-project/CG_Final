@@ -42,6 +42,6 @@ void AnimationModel::Draw(Shader &shader) {
     model = glm::translate(model, this->position);
     model = glm::scale(model, this->scale);
 
-    shader.SetMatrix4("model", model);
+    shader.setMat4("model", model);
     this->mesh.Render();
 }

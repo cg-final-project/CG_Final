@@ -22,20 +22,20 @@ void AnimationController::InitController() {
 
 void AnimationController::InitDepthShader(glm::mat4 lightSpaceMatrix) {
     //Shadow map
-    this->depth_shader.Use();
-    this->depth_shader.SetMatrix4("lightSpaceMatrix", lightSpaceMatrix);
+    this->depth_shader.use();
+    this->depth_shader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 }
 
 void AnimationController::InitShader(glm::mat4 lightSpaceMatrix, unsigned int diffuseTexture, unsigned int shadowMap,
                                      glm::vec3 lightPos, glm::vec3 viewPos, glm::mat4 projection, glm::mat4 view) {
 
-    this->shader.Use();
-    this->shader.SetInteger("diffuseTexture", diffuseTexture);
-    this->shader.SetInteger("shadowMap", shadowMap);
-    this->shader.SetVector3f("lightPos", lightPos);
-    this->shader.SetVector3f("viewPos", viewPos);
-    this->shader.SetMatrix4("projection", projection);
-    this->shader.SetMatrix4("view", view);
+    this->shader.use();
+    this->shader.setInt("diffuseTexture", diffuseTexture);
+    this->shader.setInt("shadowMap", shadowMap);
+    this->shader.setVec3("lightPos", lightPos);
+    this->shader.setVec3("viewPos", viewPos);
+    this->shader.setMat4("projection", projection);
+    this->shader.setMat4("view", view);
 }
 
 void AnimationController::RenderDepth() {
