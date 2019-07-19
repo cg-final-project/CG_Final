@@ -8,6 +8,8 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "Model.h"
+#include "Animaion.h"
+#include "AnimaionModel.h"
 
 #include "stb_image.h"
 #include "SkyBox.h"
@@ -98,8 +100,12 @@ int main()
 	// load models
 	// -----------
 	Model courtModel("C:/Users/cheny/Desktop/CG_Final/res/model/court/court.obj");
-	Model playerModel("C:/Users/cheny/Desktop/CG_Final/res/model/player/pose.obj");
 	Model ballModel("C:/Users/cheny/Desktop/CG_Final/res/model/ball/ball.obj");
+
+	// animation
+	// -----------
+	AnimationController animation;
+	animation.InitController();
 
 	//build and compile shaders
 	//-------------------------
@@ -156,6 +162,8 @@ int main()
 		// material properties
 		ourShader.setFloat("shininess", 32.0f);
 
+		// animation
+		animation.Render()
 
 		// view/projection transformations
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -175,13 +183,6 @@ int main()
 		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
 		ourShader.setMat4("model", model);
 		ballModel.Draw(ourShader);
-
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f)); // translate it down so it's at the center of the scene
-		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
-		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0, 1.0, 0.0));
-		ourShader.setMat4("model", model);
-		playerModel.Draw(ourShader);
 
 		//render skytype
 		skybox.RenderSkybox(skyboxShader, view, projection, camera);
