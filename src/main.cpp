@@ -47,6 +47,8 @@ float lastFrame = 0.0f;
 // lighting
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
+float lightValue[3] = {-12.0f, 25.0f, -12.0f};
+
 int main()
 {
 	// glfw: initialize and configure
@@ -107,6 +109,12 @@ int main()
 	AnimationController animation;
 	animation.InitController();
 
+	glm::mat4 lightProjection = glm::ortho(-200.0f, 200.0f, -200.0f, 200.0f, near_plane, far_plane);
+    glm::mat4 lightView = glm::lookAt(glm::vec3(lightValue[0], lightValue[1], lightValue[2]), glm::vec3(0.0f),
+                                          glm::vec3(0.0, 1.0, 0.0));
+    glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+	animations.InitDepthShader(lightSpaceMatrix);
+
 	//build and compile shaders
 	//-------------------------
 	Shader skyboxShader("skybox.vs", "skybox.fs");
@@ -161,8 +169,14 @@ int main()
 
 		// material properties
 		ourShader.setFloat("shininess", 32.0f);
+		
+		// draw animation model
+		view = camera.GetViewMatrix();
+		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f, 500.0f);
+		animations.InitShader(lightSpaceMatrix, 0, 3, glm::vec3(lightValue[0], lightValue[1], lightValue[2]),camera.Position, projection, view);
 
 		// animation
+		animations.RenderDepth();
 		animation.Render();
 
 		// view/projection transformations
