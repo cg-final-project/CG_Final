@@ -1,4 +1,12 @@
 #include "AnimatedModel.h"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include "Shader.h"
 
 AnimationModel::AnimationModel(const char *path, glm::vec3 scale, glm::vec3 position, glm::vec3 rotate) {
     this->mesh.LoadMesh(path);
@@ -9,7 +17,7 @@ AnimationModel::AnimationModel(const char *path, glm::vec3 scale, glm::vec3 posi
 }
 
 void AnimationModel::Draw(Shader &shader) {
-    shader.Use();
+    shader.use();
     GLuint m_boneLocation[MAX_BONES];
     for (unsigned int i = 0; i < ARRAY_SIZE_IN_ELEMENTS(m_boneLocation); i++) {
         char Name[128];
@@ -42,6 +50,6 @@ void AnimationModel::Draw(Shader &shader) {
     model = glm::translate(model, this->position);
     model = glm::scale(model, this->scale);
 
-    shader.SetMatrix4("model", model);
+    shader.setMat4("model", model);
     this->mesh.Render();
 }

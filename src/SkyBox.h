@@ -78,12 +78,12 @@ public:
 
 		vector<std::string> faces
 		{
-			"../resource/resources/textures/skybox3/right.jpg",
-			"../resource/resources/textures/skybox3/left.jpg",
-			"../resource/resources/textures/skybox3/top.jpg",
-			"../resource/resources/textures/skybox3/bottom.jpg",
-			"../resource/resources/textures/skybox3/front.jpg",
-			"../resource/resources/textures/skybox3/back.jpg"
+			"../../res/textures/skybox3/right.jpg",
+			"../../res/textures/skybox3/left.jpg",
+			"../../res/textures/skybox3/top.jpg",
+			"../../res/textures/skybox3/bottom.jpg",
+			"../../res/textures/skybox3/front.jpg",
+			"../../res/textures/skybox3/back.jpg"
 		};
 		cubemapTexture = loadCubemap(faces);
 		cout << cubemapTexture << endl;

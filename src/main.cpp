@@ -8,8 +8,8 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "Model.h"
-#include "Animaion.h"
-#include "AnimaionModel.h"
+#include "Animation.h"
+#include "AnimatedModel.h"
 
 #include "stb_image.h"
 #include "SkyBox.h"
@@ -99,8 +99,8 @@ int main()
 
 	// load models
 	// -----------
-	Model courtModel("C:/Users/cheny/Desktop/CG_Final/res/model/court/court.obj");
-	Model ballModel("C:/Users/cheny/Desktop/CG_Final/res/model/ball/ball.obj");
+	Model courtModel("../../res/model/court/court.obj");
+	Model ballModel("../../res/model/ball/ball.obj");
 
 	// animation
 	// -----------
@@ -156,14 +156,14 @@ int main()
 		ourShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
 		ourShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 		ourShader.setFloat("light.constant", 1.0f);
-		ourShader.setFloat("light.linear", 0.09f);
-		ourShader.setFloat("light.quadratic", 0.032f);
+		ourShader.setFloat("light.linear", 0.007);
+		ourShader.setFloat("light.quadratic", 0.0002);
 
 		// material properties
 		ourShader.setFloat("shininess", 32.0f);
 
 		// animation
-		animation.Render()
+		animation.Render();
 
 		// view/projection transformations
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);

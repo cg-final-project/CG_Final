@@ -3,7 +3,7 @@
 
 
 Shadow::Shadow() {
-    shadowShader = Shader("../src/shaders/shadow_vert.glsl", "../src/shaders/shadow_frag.glsl");
+    shadowShader = Shader("Shadow.vs", "Shadow.fs");
 
 
     glGenTextures(1, &depthMap);
@@ -32,7 +32,7 @@ Shadow &Shadow::getInstance() {
 
 
 std::array<GLint, 4> Shadow::bind() {
-    shadowShader.Use();
+    shadowShader.use();
     std::array<GLint, 4> prevViewPort{};
     glGetIntegerv(GL_VIEWPORT, prevViewPort.data());
     glViewport(0, 0, width, height);

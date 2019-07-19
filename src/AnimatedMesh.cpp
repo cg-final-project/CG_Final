@@ -117,6 +117,9 @@ bool AnimationMesh::LoadMesh(const string &Filename) {
 
 
 bool AnimationMesh::InitFromScene(const aiScene *pScene, const string &Filename) {
+
+	cout << "pScene->mNumMeshes = " << pScene->mNumMeshes << endl;
+
     m_Entries.resize(pScene->mNumMeshes);
     m_Textures.resize(pScene->mNumMaterials);
 
@@ -146,6 +149,8 @@ bool AnimationMesh::InitFromScene(const aiScene *pScene, const string &Filename)
     TexCoords.reserve(NumVertices);
     Bones.resize(NumVertices);
     Indices.reserve(NumIndices);
+	 
+	cout << "m_Entries.size() = " << m_Entries.size() << endl;
 
     // Initialize the meshes in the scene one by one
     for (uint i = 0; i < m_Entries.size(); i++) {
@@ -201,7 +206,7 @@ void AnimationMesh::InitMesh(uint MeshIndex,
         const aiVector3D *pPos = &(paiMesh->mVertices[i]);
         const aiVector3D *pNormal = &(paiMesh->mNormals[i]);
         const aiVector3D *pTexCoord = paiMesh->HasTextureCoords(0) ? &(paiMesh->mTextureCoords[0][i]) : &Zero3D;
-
+		//cout << "Positions.push_back(Vector3f(pPos->x, pPos->y, pPos->z));\n(" << pPos->x << ", " << pPos->y << ", " << pPos->z << ")" << endl;
         Positions.push_back(Vector3f(pPos->x, pPos->y, pPos->z));
         Normals.push_back(Vector3f(pNormal->x, pNormal->y, pNormal->z));
         TexCoords.push_back(Vector2f(pTexCoord->x, pTexCoord->y));
