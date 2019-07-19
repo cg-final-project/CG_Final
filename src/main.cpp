@@ -106,14 +106,14 @@ int main()
 
 	// animation
 	// -----------
-	AnimationController animation;
-	animation.InitController();
+	AnimationController animations;
+	animations.InitController();
 
+	GLfloat near_plane = 1.00f, far_plane = 100.0f;
 	glm::mat4 lightProjection = glm::ortho(-200.0f, 200.0f, -200.0f, 200.0f, near_plane, far_plane);
     glm::mat4 lightView = glm::lookAt(glm::vec3(lightValue[0], lightValue[1], lightValue[2]), glm::vec3(0.0f),
                                           glm::vec3(0.0, 1.0, 0.0));
     glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-	animations.InitDepthShader(lightSpaceMatrix);
 
 	//build and compile shaders
 	//-------------------------
@@ -171,17 +171,18 @@ int main()
 		ourShader.setFloat("shininess", 32.0f);
 		
 		// draw animation model
-		view = camera.GetViewMatrix();
-		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f, 500.0f);
-		animations.InitShader(lightSpaceMatrix, 0, 3, glm::vec3(lightValue[0], lightValue[1], lightValue[2]),camera.Position, projection, view);
+		glm::mat4 view = camera.GetViewMatrix();
+		glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float) SCR_WIDTH / (float) SCR_HEIGHT, 0.1f, 100.0f);
+		projection = glm::translate(projection, glm::vec3(0.0f, -3.0f, 0.0f));
+		//animations.InitShader(lightSpaceMatrix, 0, 3, glm::vec3(lightValue[0], lightValue[1], lightValue[2]),camera.Position, projection, view);
 
 		// animation
-		animations.RenderDepth();
-		animation.Render();
+		//animations.Render();
 
 		// view/projection transformations
-		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		glm::mat4 view = camera.GetViewMatrix();
+		//view = camera.GetViewMatrix();
+		projection = glm::mat4(1.0f);
+		projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 		ourShader.setMat4("projection", projection);
 		ourShader.setMat4("view", view);
 
