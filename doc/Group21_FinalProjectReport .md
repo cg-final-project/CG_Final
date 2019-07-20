@@ -6,11 +6,13 @@
 
 实验结果截图如下：
 
-![球员及场景展示](E:\project\CG_Final\doc\images\球员及场景展示.gif)
+![球员及场景展示](https://github.com/cg-final-project/CG_Final/blob/master/doc/images/%E7%90%83%E5%91%98%E5%8F%8A%E5%9C%BA%E6%99%AF%E5%B1%95%E7%A4%BA.gif)
 
-![骨骼动画效果](E:\project\CG_Final\doc\images\骨骼动画效果.gif)
+![骨骼动画效果](https://github.com/cg-final-project/CG_Final/blob/master/doc/images/%E9%AA%A8%E9%AA%BC%E5%8A%A8%E7%94%BB%E6%95%88%E6%9E%9C.gif)
 
-![阴影效果](E:\project\CG_Final\doc\images\球的模型.png)
+![阴影效果](https://github.com/cg-final-project/CG_Final/blob/master/doc/images/%E9%98%B4%E5%BD%B1%E6%95%88%E6%9E%9C.jpg)
+
+![球的模型](https://github.com/cg-final-project/CG_Final/blob/master/doc/images/%E7%90%83%E7%9A%84%E6%A8%A1%E5%9E%8B.png)
 
 
 
