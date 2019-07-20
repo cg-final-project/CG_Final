@@ -4,7 +4,6 @@
 
 我们小组这次实现的项目叫作《篮球练习生》，是一个篮球场场景，球员在场内，通过WASD可以控制摄像机的位置，借此来观察球员。
 
-实现结果截图如下：
 
 
 
@@ -21,22 +20,19 @@
 1. Camera Roaming
 2. Simple lighting and shading(phong)
 3. Texture mapping
-4. Shadow mapping
-
+4. Shadow mapping（期末项目展示时还未实现，现已完成）
 5. Model import & Mesh viewing (Assimp)
 
 **Bonus:** 
 
 1. Sky Box (天空盒)
-
 2. Display Text (显示文字，英文/平面)
-3. Skeletal Animation (骨骼动画)
+3. Skeletal Animation (骨骼动画)（期末项目展示时还未实现，现已完成）
 
 #### 实现功能点简单介绍
 
 此部分在小组成员个人报告中详细介绍
 
-#### 遇到的问题和解决方案
 
 #### 小组成员分工
 
