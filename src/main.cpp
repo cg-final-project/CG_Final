@@ -23,6 +23,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
+void renderScene(const Shader &shader, Model &courtModel, Model &ballModel);
 
 // settings
 const unsigned int SCR_WIDTH = 1280;
@@ -45,9 +46,11 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
 // lighting
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+glm::vec3 lightPos(1.2f, 10.0f, 2.0f);
 
 float lightValue[3] = {-12.0f, 25.0f, -12.0f};
+
+
 
 int main()
 {
@@ -98,6 +101,7 @@ int main()
 	// build and compile shaders
 	// -------------------------
 	Shader ourShader("model.vs", "model.fs");
+	Shader simpleDepthShader("depth.vs", "depth.fs");
 
 	// load models
 	// -----------
@@ -106,14 +110,14 @@ int main()
 
 	// animation
 	// -----------
-	AnimationController animations;
+	/*AnimationController animations;
 	animations.InitController();
 
 	GLfloat near_plane = 1.00f, far_plane = 100.0f;
 	glm::mat4 lightProjection = glm::ortho(-200.0f, 200.0f, -200.0f, 200.0f, near_plane, far_plane);
     glm::mat4 lightView = glm::lookAt(glm::vec3(lightValue[0], lightValue[1], lightValue[2]), glm::vec3(0.0f),
                                           glm::vec3(0.0, 1.0, 0.0));
-    glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+    glm::mat4 lightSpaceMatrix = lightProjection * lightView;*/
 
 	//build and compile shaders
 	//-------------------------
@@ -130,6 +134,31 @@ int main()
 	//load text
 	//---------
 	text.loadText(textShader);
+
+	// Configure depth map FBO
+	const GLuint SHADOW_WIDTH = 1280, SHADOW_HEIGHT = 1280;
+	GLuint depthMapFBO;
+	glGenFramebuffers(1, &depthMapFBO);
+	// - Create depth texture
+	GLuint depthMap;
+	glGenTextures(1, &depthMap);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	GLfloat borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
 	// draw in wireframe
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -148,9 +177,29 @@ int main()
 		// -----
 		processInput(window);
 
+		GLfloat near_plane = 1.0f, far_plane = 100.0f;
+		glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+		glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+		glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+
 		// render
 		// ------
 		glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		//glCullFace(GL_FRONT);
+		simpleDepthShader.use();
+		simpleDepthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		renderScene(simpleDepthShader, courtModel, ballModel);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		//glCullFace(GL_BACK);
+
+		// reset viewport
+		glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// don't forget to enable shader before setting uniforms
@@ -169,6 +218,7 @@ int main()
 
 		// material properties
 		ourShader.setFloat("shininess", 32.0f);
+		ourShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 		
 		// draw animation model
 		glm::mat4 view = camera.GetViewMatrix();
@@ -185,20 +235,10 @@ int main()
 		projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 		ourShader.setMat4("projection", projection);
 		ourShader.setMat4("view", view);
-
-		// render the loaded model
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f)); // translate it down so it's at the center of the scene
-		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
-		ourShader.setMat4("model", model);
-		courtModel.Draw(ourShader);
-
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, -1.7f, 0.5f)); // translate it down so it's at the center of the scene
-		model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
-		ourShader.setMat4("model", model);
-		ballModel.Draw(ourShader);
-
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, depthMap);
+		renderScene(ourShader, courtModel, ballModel);
+		
 		//render skytype
 		skybox.RenderSkybox(skyboxShader, view, projection, camera);
 
@@ -219,6 +259,26 @@ int main()
 	glfwTerminate();
 	return 0;
 }
+
+// renders the 3D scene
+// --------------------
+void renderScene(const Shader &shader, Model &courtModel, Model &ballModel)
+{
+	// floor
+	// render the loaded model
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(0.0f, -1.75f, 0.0f)); // translate it down so it's at the center of the scene
+	model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
+	shader.setMat4("model", model);
+	courtModel.Draw(shader);
+
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(0.0f, -1.7f, 0.5f)); // translate it down so it's at the center of the scene
+	model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
+	shader.setMat4("model", model);
+	ballModel.Draw(shader);
+}
+
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------

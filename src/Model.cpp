@@ -123,8 +123,6 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
 	material->Get(AI_MATKEY_COLOR_SPECULAR, color);
 	mat.Ks = glm::vec4(color.r, color.g, color.b, 1.0);
 	
-	
-	
 	// we assume a convention for sampler names in the shaders. Each diffuse texture should be named
 	// as 'texture_diffuseN' where N is a sequential number ranging from 1 to MAX_SAMPLER_NUMBER. 
 	// Same applies to other texture as the following list summarizes:
