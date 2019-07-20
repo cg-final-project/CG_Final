@@ -12,8 +12,6 @@
 
 ![阴影效果](https://github.com/cg-final-project/CG_Final/blob/master/doc/images/%E9%98%B4%E5%BD%B1%E6%95%88%E6%9E%9C.jpg)
 
-![球的模型](https://github.com/cg-final-project/CG_Final/blob/master/doc/images/%E7%90%83%E7%9A%84%E6%A8%A1%E5%9E%8B.png)
-
 
 
 
